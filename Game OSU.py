@@ -27,8 +27,8 @@ def ball_and_score(score, radius):
     # Pozadí okna RGB formát = vymažeme předchozí obsah okna
     screen.fill((255, 255, 255))
                     
-    x = random.randint(0, 640)
-    y = random.randint(0, 480)
+    x = random.randint(radius, 640-radius)
+    y = random.randint(radius, 480-radius)
 
     # Vykreslíme nový míček (na náhodné pozici z IF) a skóre
     ball = pygame.draw.circle(screen, (0, 0, 255), (x,y), radius)
@@ -45,7 +45,7 @@ def moving_ball_prop():
     # nastavení rychlosti míčku
     speed = [round(random.uniform(-0.5, 0.5), 2), round(random.uniform(-0.5, 0.5), 2)]
     # nastavení polohy míčku
-    ball_pos = [random.randint(0, 640), random.randint(0, 480)]
+    ball_pos = [random.randint(difficulty.get(level), 640-difficulty.get(level)), random.randint(difficulty.get(level), 480-difficulty.get(level))]
     # nastavení průměru míčku
     ball_radius = difficulty.get(level)
 
@@ -88,9 +88,9 @@ def show_level(level):
 
 
 # Počáteční skóre
-score = 0
+score = 25
 # Počáteční level
-level = 0
+level = 2
 
 
 while level < 2:
@@ -216,6 +216,25 @@ while level == 2:
         show_score(score)
         # aktualizace obrazovky
         pygame.display.update()
+
+# Konečný čas
+current_time = pygame.time.get_ticks()
+# Vymažeme předchozí obsah okna
+screen.fill((255, 255, 255))
+# Nastavení fontu a velikosti textu
+font = pygame.font.Font(None, 50)
+# Nastavení textu na základě levelu
+text = font.render("Your time: {}s".format(current_time//1000), True, (0, 0, 0))
+text_rect = text.get_rect()
+text_rect.center = screen.get_rect().center
+# Vykreslení textu na obrazovku
+screen.blit(text, text_rect)
+# Obnovení obrazovky
+pygame.display.flip()
+
+# Program čeká 5 sekund
+pygame.time.delay(5000)
+
 
 # ukončení knihovny Pygame
 pygame.quit()
