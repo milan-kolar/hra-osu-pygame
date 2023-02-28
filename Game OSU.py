@@ -13,7 +13,7 @@ current_time = 0
 ball_screen_time = 0
 
 # Titulek
-pygame.display.set_caption("Sestřelit míček")
+pygame.display.set_caption("Click it!")
 
 # Definování levelů a jejich obtížností
 difficulty = {
@@ -87,153 +87,245 @@ def show_level(level):
     pygame.time.delay(1000)
 
 
-# Počáteční skóre
-score = 25
-# Počáteční level
-level = 2
+# Barvy
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GRAY = (200, 200, 200)
 
+# Font pro text
+font = pygame.font.Font(None, 60)
 
-while level < 2:
+# Vytvoření tlačítek
+button_play = font.render("Play", True, BLACK)
+button_rules = font.render("Rules", True, BLACK)
+button_quit = font.render("Exit", True, BLACK)
 
-    # Ukaž číslo levelu
-    show_level(level)
+# Umístění tlačítek
+button_play_pos = button_play.get_rect(center=(640 // 2, 480 // 2 - 100))
+button_rules_pos = button_rules.get_rect(center=(640 // 2, 480 // 2))
+button_quit_pos = button_quit.get_rect(center=(640 // 2, 480 // 2 + 100))
 
-    # Nový míček (ihned se připraví na vykreslení - PROČ??)
-    ball = ball_and_score(score, difficulty.get(level))
-    ball_screen_time = ball_time()
-    # Aktualizace okna
-    pygame.display.flip()  
+# Hlavní smyčka programu
+waiting = True
+clock = pygame.time.Clock()
+fade_speed = 10
+alpha = 0
+text = font.render('Click it!', True, BLACK)
 
-# Hra běží, dokud nezavřeme okno nebo nedosáhneme skóre 10 bodů
-    running = True
-    while running:
-        # Získáme seznam událostí
-        for event in pygame.event.get():
-            # Událost == okno zavřeno --> ukončíme hru
-            if event.type == pygame.QUIT:
-                running = False
-                level = 3
-            # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                # Získáme souřadnice myši
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Zjistíme, zda se míček a myš překrývají
-                if ball.collidepoint((mouse_x, mouse_y)):
-                    # +1 bod
-                    score += 1
-                    # 10 bodů --> ukončíme hru
-                    if score >= 10*(level+1):
-                        running = False
-                    # Jinak nový míček na náhodné pozici
-                    else:
-                        # Vykreslení míčku a skóre
-                        ball = ball_and_score(score, difficulty.get(level))
-                        # Měření času míčku na obzarovce
-                        ball_screen_time = ball_time()
-        
-        
-        if current_time - ball_screen_time > 1000:
-            # Vykreslení míčku a skóre
-            ball = ball_and_score(score, difficulty.get(level))
-            # Měření času míčku na obzarovce
-            ball_screen_time = ball_time()
-
-        # Měření aktuálního času
-        current_time = pygame.time.get_ticks()
-
-        # Aktualizace okna
-        pygame.display.flip()
-
-        # Neznámý řádek, PŘIČÍTÁ MILISEKUNDY??, 1frame = 17ms
-        clock.tick(60)
+while waiting:
+    current_time = pygame.time.get_ticks()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    if current_time > 3200:
+        waiting = False
     
-    # Zvýšit level
-    level += 1
+    # zrušení pozadí
+    screen.fill(WHITE)
 
-while level == 2:
+    # nastavení alfa kanálu textu
+    if current_time < 1500:
+        alpha = int(min(max(0, alpha + fade_speed),255))
+    elif current_time < 3000:
+        alpha = int(max(0, alpha - fade_speed))
 
-    # Ukaž číslo levelu
-    show_level(level)
+    # nastavení barvy textu
+    color = (alpha, alpha, alpha)
+
+    # nastavení barvy textu
+    text = font.render('Click it!', True, color)
+
+    # vykreslení textu
+    screen.blit(text, (640 // 2 - text.get_width() // 2, 480 // 2 - text.get_height() // 2))
+
+    # obnovování obrazovky
+    pygame.display.flip()
+
+    # omezení počtu snímků na 30 za sekundu
+    clock.tick(30)
+
+while True:
     
-    # Nastav vlastnosti nového míčku
-    moving_ball_prop()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if button_play_pos.collidepoint(event.pos):
+                # Zde hra
+                
+                # Počáteční skóre
+                score = 0
+                # Počáteční level
+                level = 0
 
-    # # nastavení rychlosti míčku
-    # speed = [0.1, 0.1]
-    # # nastavení polohy míčku
-    # ball_pos = [random.randint(0, 640), random.randint(0, 480)]
-    # # nastavení průměru míčku
-    # ball_radius = difficulty.get(level)
+                while level < 2:
 
-    # vyčištění obrazovky
-    screen.fill((255, 255, 255))
-    # vykreslení míčku
-    ball = pygame.draw.circle(screen, (255, 0, 0), ball_pos, ball_radius)
-    # Vykreslení skóre
-    show_score(score)
-    # aktualizace obrazovky
-    pygame.display.update()
+                    # Ukaž číslo levelu
+                    show_level(level)
 
-    # hlavní smyčka programu
-    running = True
-    while running:
+                    # Nový míček (ihned se připraví na vykreslení - PROČ??)
+                    ball = ball_and_score(score, difficulty.get(level))
+                    ball_screen_time = ball_time()
+                    # Aktualizace okna
+                    pygame.display.flip()  
 
-        for event in pygame.event.get():
-            # Událost == okno zavřeno --> ukončíme hru
-            if event.type == pygame.QUIT:
-                running = False
-                level = 3
-            # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                # Získáme souřadnice myši
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Zjistíme, zda se míček a myš překrývají
-                if ball.collidepoint((mouse_x, mouse_y)):
-                    # +1 bod
-                    score += 1
+                    # Hra běží, dokud nezavřeme okno nebo nedosáhneme skóre 10 bodů
+                    running = True
+                    while running:
+                        # Získáme seznam událostí
+                        for event in pygame.event.get():
+                            # Událost == okno zavřeno --> ukončíme hru
+                            if event.type == pygame.QUIT:
+                                running = False
+                                level = 3
+                            # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
+                            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                                # Získáme souřadnice myši
+                                mouse_x, mouse_y = pygame.mouse.get_pos()
+                                # Zjistíme, zda se míček a myš překrývají
+                                if ball.collidepoint((mouse_x, mouse_y)):
+                                    # +1 bod
+                                    score += 1
+                                    # 10 bodů --> ukončíme hru
+                                    if score >= 10*(level+1):
+                                        running = False
+                                    # Jinak nový míček na náhodné pozici
+                                    else:
+                                        # Vykreslení míčku a skóre
+                                        ball = ball_and_score(score, difficulty.get(level))
+                                        # Měření času míčku na obzarovce
+                                        ball_screen_time = ball_time()
+                        
+                        
+                        if current_time - ball_screen_time > 1000:
+                            # Vykreslení míčku a skóre
+                            ball = ball_and_score(score, difficulty.get(level))
+                            # Měření času míčku na obzarovce
+                            ball_screen_time = ball_time()
+
+                        # Měření aktuálního času
+                        current_time = pygame.time.get_ticks()
+
+                        # Aktualizace okna
+                        pygame.display.flip()
+
+                        # Neznámý řádek, PŘIČÍTÁ MILISEKUNDY??, 1frame = 17ms
+                        clock.tick(60)
+                    
+                    # Zvýšit level
+                    level += 1
+
+                while level == 2:
+
+                    # Ukaž číslo levelu
+                    show_level(level)
+                    
                     # Nastav vlastnosti nového míčku
                     moving_ball_prop()
-                    # 10 bodů --> ukončíme hru
-                    if score >= 10*(level+1):
-                        running = False
-                        level = 3
 
-        # pohyb míčku
-        ball_pos[0] += speed[0]
-        ball_pos[1] += speed[1]
+                    # vyčištění obrazovky
+                    screen.fill((255, 255, 255))
+                    # vykreslení míčku
+                    ball = pygame.draw.circle(screen, (255, 0, 0), ball_pos, ball_radius)
+                    # Vykreslení skóre
+                    show_score(score)
+                    # aktualizace obrazovky
+                    pygame.display.update()
 
-        # odrážení míčku od okrajů obrazovky
-        if ball_pos[0] - ball_radius < 0 or ball_pos[0] + ball_radius > 640:
-            speed[0] = -speed[0]
-        if ball_pos[1] - ball_radius < 0 or ball_pos[1] + ball_radius > 480:
-            speed[1] = -speed[1]
+                    # hlavní smyčka programu
+                    running = True
+                    while running:
 
-        # vykreslení pozadí
-        screen.fill((255, 255, 255))
-        # vykreslení míčku
-        ball = pygame.draw.circle(screen, (255, 0, 0), ball_pos, ball_radius)
-        # Vykreslení skóre
-        show_score(score)
-        # aktualizace obrazovky
-        pygame.display.update()
+                        for event in pygame.event.get():
+                            # Událost == okno zavřeno --> ukončíme hru
+                            if event.type == pygame.QUIT:
+                                running = False
+                                level = 3
+                            # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
+                            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                                # Získáme souřadnice myši
+                                mouse_x, mouse_y = pygame.mouse.get_pos()
+                                # Zjistíme, zda se míček a myš překrývají
+                                if ball.collidepoint((mouse_x, mouse_y)):
+                                    # +1 bod
+                                    score += 1
+                                    # Nastav vlastnosti nového míčku
+                                    moving_ball_prop()
+                                    # 10 bodů --> ukončíme hru
+                                    if score >= 10*(level+1):
+                                        running = False
+                                        level = 3
 
-# Konečný čas
-current_time = pygame.time.get_ticks()
-# Vymažeme předchozí obsah okna
-screen.fill((255, 255, 255))
-# Nastavení fontu a velikosti textu
-font = pygame.font.Font(None, 50)
-# Nastavení textu na základě levelu
-text = font.render("Your time: {}s".format(current_time//1000), True, (0, 0, 0))
-text_rect = text.get_rect()
-text_rect.center = screen.get_rect().center
-# Vykreslení textu na obrazovku
-screen.blit(text, text_rect)
-# Obnovení obrazovky
-pygame.display.flip()
+                        # pohyb míčku
+                        ball_pos[0] += speed[0]
+                        ball_pos[1] += speed[1]
 
-# Program čeká 5 sekund
-pygame.time.delay(5000)
+                        # odrážení míčku od okrajů obrazovky
+                        if ball_pos[0] - ball_radius < 0 or ball_pos[0] + ball_radius > 640:
+                            speed[0] = -speed[0]
+                        if ball_pos[1] - ball_radius < 0 or ball_pos[1] + ball_radius > 480:
+                            speed[1] = -speed[1]
+
+                        # vykreslení pozadí
+                        screen.fill((255, 255, 255))
+                        # vykreslení míčku
+                        ball = pygame.draw.circle(screen, (255, 0, 0), ball_pos, ball_radius)
+                        # Vykreslení skóre
+                        show_score(score)
+                        # aktualizace obrazovky
+                        pygame.display.update()
+
+                # Konečný čas
+                ball_screen_time = pygame.time.get_ticks()
+                # Vymažeme předchozí obsah okna
+                screen.fill((255, 255, 255))
+                # Nastavení fontu a velikosti textu
+                font = pygame.font.Font(None, 50)
+                # Nastavení textu na základě levelu
+                text = font.render("Your time: {}s".format(ball_screen_time//1000), True, (0, 0, 0))
+                text_rect = text.get_rect()
+                text_rect.center = screen.get_rect().center
+                # Vykreslení textu na obrazovku
+                screen.blit(text, text_rect)
+                # Obnovení obrazovky
+                pygame.display.flip()
+
+                waiting = True
+                # Program čeká 5 sekund
+                while waiting:
+                    current_time = pygame.time.get_ticks()
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            waiting = False
+                    if current_time - ball_screen_time > 5000:
+                        waiting = False
+
+            elif button_rules_pos.collidepoint(event.pos):
+                # Zde pravidla
+                pass
+            elif button_quit_pos.collidepoint(event.pos):
+                pygame.quit()
+                quit()
+
+    # Vyplnění pozadí černou barvou
+    screen.fill(WHITE)
+
+    # Vykreslení tlačítek
+    pygame.draw.rect(screen, GRAY, button_play_pos)
+    screen.blit(button_play, button_play_pos)
+    pygame.draw.rect(screen, GRAY, button_rules_pos)
+    screen.blit(button_rules, button_rules_pos)
+    pygame.draw.rect(screen, GRAY, button_quit_pos)
+    screen.blit(button_quit, button_quit_pos)
+
+    pygame.display.update()
+
+
+
+
+
 
 
 # ukončení knihovny Pygame
