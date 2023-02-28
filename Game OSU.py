@@ -159,6 +159,8 @@ while True:
                 score = 0
                 # Počáteční level
                 level = 0
+                # Startovní čas
+                start_time = pygame.time.get_ticks()
 
                 while level < 2:
 
@@ -284,7 +286,7 @@ while True:
                 # Nastavení fontu a velikosti textu
                 font = pygame.font.Font(None, 50)
                 # Nastavení textu na základě levelu
-                text = font.render("Your time: {}s".format(ball_screen_time//1000), True, (0, 0, 0))
+                text = font.render("Your time: {}s".format((ball_screen_time - start_time)//1000), True, (0, 0, 0))
                 text_rect = text.get_rect()
                 text_rect.center = screen.get_rect().center
                 # Vykreslení textu na obrazovku
@@ -293,13 +295,13 @@ while True:
                 pygame.display.flip()
 
                 waiting = True
-                # Program čeká 5 sekund
+                # Program čeká 3 sekundy
                 while waiting:
                     current_time = pygame.time.get_ticks()
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             waiting = False
-                    if current_time - ball_screen_time > 5000:
+                    if current_time - ball_screen_time > 3000:
                         waiting = False
 
             elif button_rules_pos.collidepoint(event.pos):
@@ -321,11 +323,6 @@ while True:
     screen.blit(button_quit, button_quit_pos)
 
     pygame.display.update()
-
-
-
-
-
 
 
 # ukončení knihovny Pygame
