@@ -86,6 +86,25 @@ def show_level(level):
     # Program čeká 1 sekundu
     pygame.time.delay(1000)
 
+# Čtení maximálního skóre
+def time_read():
+    min_time = open("min_time.txt", "a")
+    min_time.close
+    min_time = open("min_time.txt", "r")
+    time_saved = min_time.read()
+    min_time.close()
+    if time_saved == "":
+        min_time = open("min_time.txt", "w")
+        min_time.write("1000000")
+        time_saved = "1000000"
+        min_time.close
+    return int(time_saved)
+
+# Zápis maximálního skóre
+def time_write(new_time):
+    min_time = open("min_time.txt", "w")
+    min_time.write(str(new_time))
+    min_time.close()
 
 # Barvy
 BLACK = (0, 0, 0)
@@ -279,30 +298,64 @@ while True:
                         # aktualizace obrazovky
                         pygame.display.update()
 
-                # Konečný čas
-                ball_screen_time = pygame.time.get_ticks()
-                # Vymažeme předchozí obsah okna
-                screen.fill((255, 255, 255))
-                # Nastavení fontu a velikosti textu
-                font = pygame.font.Font(None, 50)
-                # Nastavení textu na základě levelu
-                text = font.render("Your time: {}s".format((ball_screen_time - start_time)//1000), True, (0, 0, 0))
-                text_rect = text.get_rect()
-                text_rect.center = screen.get_rect().center
-                # Vykreslení textu na obrazovku
-                screen.blit(text, text_rect)
-                # Obnovení obrazovky
-                pygame.display.flip()
+                if score == 30:
+                    # Konečný čas
+                    ball_screen_time = pygame.time.get_ticks()
+                    show_time = ((ball_screen_time - start_time)//1000)
+                    
 
-                waiting = True
-                # Program čeká 3 sekundy
-                while waiting:
-                    current_time = pygame.time.get_ticks()
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
+                    # Ulož nové maximální skóre
+                    if show_time < time_read():
+                        time_write(show_time)
+                        new_best = True
+                    else:
+                        new_best = False
+                        
+                        
+
+                    waiting = True
+                    # Program čeká 3 sekundy
+                    while waiting:
+                        current_time = pygame.time.get_ticks()
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                waiting = False
+                        if current_time - ball_screen_time > 3000:
                             waiting = False
-                    if current_time - ball_screen_time > 3000:
-                        waiting = False
+                        
+                        
+                        # Vymažeme předchozí obsah okna
+                        screen.fill((255, 255, 255))
+                        # Nastavení fontu a velikosti textu
+                        font = pygame.font.Font(None, 50)
+                        # Nastavení textu na základě levelu
+                        text = font.render("Your time: {}s".format(show_time), True, (0, 0, 0))
+                        text_rect = text.get_rect()
+                        text_rect.center = screen.get_rect().center
+                        # Vykreslení textu na obrazovku
+                        screen.blit(text, text_rect)
+
+                        if new_best:
+                            # nastavení alfa kanálu textu
+                            if (current_time - ball_screen_time) < 1500:
+                                alpha = int(min(max(0, alpha + fade_speed),255))
+                            elif (current_time - ball_screen_time) < 3000:
+                                alpha = int(max(0, alpha - fade_speed))
+
+                            # nastavení barvy textu
+                            color = (alpha, alpha, alpha)
+
+                            # nastavení barvy textu
+                            text = font.render('New best time!', True, color)
+
+                            # vykreslení textu
+                            screen.blit(text, (640 // 2 - text.get_width() // 2, 480 // 4 - text.get_height() // 2))
+
+                        # obnovování obrazovky
+                        pygame.display.flip()
+
+                        # omezení počtu snímků na 30 za sekundu
+                        clock.tick(30)
 
             elif button_rules_pos.collidepoint(event.pos):
                 # Zde pravidla
