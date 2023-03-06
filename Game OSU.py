@@ -416,6 +416,16 @@ while True:
     # Vyplnění pozadí černou barvou
     screen.fill(WHITE)
 
+    # Nastavení fontu a velikosti textu
+    best_time_font = pygame.font.Font(None, 50)
+    # Nastavení textu na základě levelu
+    text = best_time_font.render("Best time: {}s".format(time_read()), True, (0, 0, 0))
+    text_rect = text.get_rect()
+    text_rect.center = screen.get_rect().center
+    # Vykreslení textu na obrazovku
+    screen.blit(text, (20, 20))
+
+
     # Vykreslení tlačítek
     pygame.draw.rect(screen, GRAY, button_play_pos)
     screen.blit(button_play, button_play_pos)
