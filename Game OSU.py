@@ -1,5 +1,6 @@
 import pygame
 import random
+from pygame import mixer
 
 # Inicializace
 pygame.init()
@@ -21,6 +22,18 @@ difficulty = {
   1: 30,
   2: 20
 }
+
+# Definování písní dle levelů
+songs = {
+  0: "level1.mp3",
+  1: "level2.mp3",
+  2: "level3.mp3",
+  3: "June - Bobby Richards.mp3"
+}
+
+# Hudba v pozadí
+mixer.music.load(songs.get(3))
+mixer.music.play(-1)
 
 # Funkce vykreslování míčku a skóre
 def ball_and_score(score, radius):
@@ -183,6 +196,11 @@ while True:
 
                 while level < 2:
 
+                    # Hraj píseň dle levelu
+                    pygame.mixer.music.load(songs.get(level))
+                    mixer.music.play(-1)
+
+
                     # Ukaž číslo levelu
                     show_level(level)
 
@@ -201,6 +219,10 @@ while True:
                             if event.type == pygame.QUIT:
                                 running = False
                                 level = 3
+                                # Hudba v pozadí
+                                mixer.music.load(songs.get(level))
+                                mixer.music.play(-1)
+
                             # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
                             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                                 # Získáme souřadnice myši
@@ -240,6 +262,10 @@ while True:
 
                 while level == 2:
 
+                    # Hraj píseň dle levelu
+                    pygame.mixer.music.load(songs.get(level))
+                    mixer.music.play(-1)
+                    
                     # Ukaž číslo levelu
                     show_level(level)
                     
@@ -264,6 +290,9 @@ while True:
                             if event.type == pygame.QUIT:
                                 running = False
                                 level = 3
+                                # Hudba v pozadí
+                                mixer.music.load(songs.get(level))
+                                mixer.music.play(-1)
                             # Stisknut mezerník --> zkontrolujeme, zda míček byl sestřelen
                             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                                 # Získáme souřadnice myši
@@ -314,13 +343,18 @@ while True:
                         
 
                     waiting = True
+
+                    # Hraj píseň dle levelu
+                    pygame.mixer.music.load("famfara.mp3")
+                    mixer.music.play()
+
                     # Program čeká 3 sekundy
                     while waiting:
                         current_time = pygame.time.get_ticks()
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
                                 waiting = False
-                        if current_time - ball_screen_time > 3000:
+                        if current_time - ball_screen_time > 16000:
                             waiting = False
                         
                         
@@ -356,6 +390,10 @@ while True:
 
                         # omezení počtu snímků na 30 za sekundu
                         clock.tick(30)
+                    
+                    # Hraj píseň dle levelu
+                    pygame.mixer.music.load(songs.get(3))
+                    mixer.music.play(-1)
 
             elif button_rules_pos.collidepoint(event.pos):
                 # Zde pravidla
